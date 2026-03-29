@@ -1,6 +1,6 @@
 # Software Requirements Specification (SRS)
 
-**Generated:** 2026-03-29 12:02:35
+**Generated:** 2026-03-29 15:06:55
 **Total Requirements:** 13
 **Requirement Groups:** 9
 
@@ -8,23 +8,112 @@
 
 ## Table of Contents
 
-- **REQ-003: Improve Login** [HIGH] (2 req)
-- **REQ-008: Access Audit Logs** [HIGH] (1 req)
-- **REQ-009: Encrypted Passwords** [HIGH] (1 req)
-- **REQ-002: Handle Payment Processing** [MEDIUM] (2 req)
-- **REQ-004: Load Dashboard** [MEDIUM] (2 req)
-- **REQ-006: Mobile App Offline Support** [MEDIUM] (1 req)
-- **REQ-001: Email More Reliable** [LOW] (2 req)
-- **REQ-005: Export Reports** [LOW] (1 req)
-- **REQ-007: Login Page** [LOW] (1 req)
+- **REQ-001: Receive Email Notifications** [HIGH] (2 req)
+- **REQ-002: Handle Payment Processing** [HIGH] (2 req)
+- **REQ-003: Cluster 3** [HIGH] (2 req)
+- **REQ-004: Load Dashboard** [HIGH] (2 req)
+- **REQ-005: Export Reports** [HIGH] (1 req)
+- **REQ-006: Offline Support** [HIGH] (1 req)
+- **REQ-007: Support Login Page** [HIGH] (1 req)
+- **REQ-008: Audit Logs** [HIGH] (1 req)
+- **REQ-009: User Passwords** [HIGH] (1 req)
 
 ---
 
-## REQ-003: Improve Login
+## REQ-001: Receive Email Notifications
+
+**Priority:** 🔴 HIGH
+**Summary:** Customers should receive email notifications when orders are shipped. The checkout flow needs to be more reliable during sales events.
+**Analysis:** Cluster 'Receive Email Notifications' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
+
+### Requirements
+
+**REQ-001.1:** Customers should receive email notifications when orders are shipped.
+
+*Type: ⚙️ Functional*
+
+| Attribute | Value |
+|-----------|-------|
+| **Actor** | Customers |
+| **Action** | receive |
+| **Feature** | email notifications |
+| **Constraint** | when orders are |
+| **Priority Indicator** | should |
+
+> **Canonical:** Customers shall receive email notifications when orders are.
+
+**Priority: HIGH** | Confidence: 59.8%
+  - Elevated priority due to explicit indicator: 'should' (+5)
+  - Medium importance due to expected requirement ('should') (+0.5)
+
+**REQ-001.2:** The checkout flow needs to be more reliable during sales events.
+
+*Type: 📊 Non-Functional*
+
+| Attribute | Value |
+|-----------|-------|
+| **Feature** | checkout flow |
+| **Constraint** | during sales events |
+| **Priority Indicator** | needs to |
+
+> **Canonical:** The system shall checkout flow during sales events.
+
+**Priority: HIGH** | Confidence: 58.5%
+  - Elevated priority due to explicit indicator: 'needs to' (+5)
+
+---
+
+## REQ-002: Handle Payment Processing
+
+**Priority:** 🔴 HIGH
+**Summary:** The system must handle payment processing within 2 seconds. The payment gateway must support multiple currencies.
+**Analysis:** Cluster 'Handle Payment Processing' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
+
+### Requirements
+
+**REQ-002.1:** The system must handle payment processing within 2 seconds.
+
+*Type: 📊 Non-Functional*
+
+| Attribute | Value |
+|-----------|-------|
+| **Actor** | The system |
+| **Action** | handle |
+| **Feature** | payment processing |
+| **Constraint** | within 2 seconds |
+| **Priority Indicator** | must |
+
+> **Canonical:** The system shall handle payment processing within 2 seconds.
+
+**Priority: HIGH** | Confidence: 62.4%
+  - Elevated priority due to explicit indicator: 'must' (+5)
+  - Contains critical time constraints: 'within 2 seconds' (+2)
+  - High importance due to mandatory requirement ('must') (+1)
+
+**REQ-002.2:** The payment gateway must support multiple currencies.
+
+*Type: ⚙️ Functional*
+
+| Attribute | Value |
+|-----------|-------|
+| **Actor** | The payment gateway |
+| **Action** | support |
+| **Feature** | currencies |
+| **Priority Indicator** | must |
+
+> **Canonical:** The payment gateway shall support currencies.
+
+**Priority: HIGH** | Confidence: 62.2%
+  - Elevated priority due to explicit indicator: 'must' (+5)
+  - High importance due to mandatory requirement ('must') (+1)
+
+---
+
+## REQ-003: Cluster 3
 
 **Priority:** 🔴 HIGH
 **Summary:** Users are complaining that login is too slow during peak hours. We should improve login speed.
-**Analysis:** Cluster 'Improve Login' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
+**Analysis:** Cluster 'Cluster 3' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
 
 ### Requirements
 
@@ -35,14 +124,15 @@
 | Attribute | Value |
 |-----------|-------|
 | **Actor** | Users |
-| **Feature** | login |
-| **Constraint** | slow during peak hours |
+| **Action** | login |
+| **Constraint** | during peak hours |
+| **Priority Indicator** | are complaining that |
 
-> **Canonical:** Users shall login slow during peak hours.
+> **Canonical:** Users shall login during peak hours.
 
 **Priority: HIGH** | Confidence: 57.8%
+  - Elevated priority due to explicit indicator: 'are complaining that, is too' (+5)
   - User pain point identified showing negative sentiment: 'complaining, slow' (+4)
-  - Highly requested feature ('login' mentioned 3x) (+3)
 
 **REQ-003.2:** We should improve login speed.
 
@@ -51,113 +141,21 @@
 | Attribute | Value |
 |-----------|-------|
 | **Action** | improve |
-| **Feature** | login speed |
+| **Priority Indicator** | We |
 
-> **Canonical:** The system shall improve login speed.
+> **Canonical:** The system shall improve.
 
-**Priority: LOW** | Confidence: 56.2%
+**Priority: HIGH** | Confidence: 56.2%
+  - Elevated priority due to explicit indicator: 'We, should' (+5)
   - Medium importance due to expected requirement ('should') (+0.5)
-
----
-
-## REQ-008: Access Audit Logs
-
-**Priority:** 🔴 HIGH
-**Summary:** Admin users need urgent access to the audit logs.
-**Analysis:** Cluster 'Access Audit Logs' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
-
-### Requirements
-
-**REQ-008.1:** Admin users need urgent access to the audit logs.
-
-*Type: ⚙️ Functional*
-
-| Attribute | Value |
-|-----------|-------|
-| **Actor** | Admin users |
-| **Action** | access |
-| **Feature** | audit logs |
-| **Priority Indicator** | urgent |
-
-> **Canonical:** Admin users shall access audit logs.
-
-**Priority: HIGH** | Confidence: 60.8%
-  - Elevated priority due to explicit indicator: 'urgent' (+5)
-  - High importance due to mandatory requirement ('need') (+1)
-
----
-
-## REQ-009: Encrypted Passwords
-
-**Priority:** 🔴 HIGH
-**Summary:** It is critical that user passwords are encrypted at all times.
-**Analysis:** Cluster 'Encrypted Passwords' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
-
-### Requirements
-
-**REQ-009.1:** It is critical that user passwords are encrypted at all times.
-
-*Type: 📊 Non-Functional*
-
-| Attribute | Value |
-|-----------|-------|
-| **Actor** | user |
-| **Action** | encrypted |
-| **Feature** | passwords |
-| **Constraint** | at all times |
-
-> **Canonical:** user shall encrypted passwords at all times.
-
-**Priority: HIGH** | Confidence: 61.5%
-  - Elevated priority due to urgency keyword: 'critical' (+5)
-
----
-
-## REQ-002: Handle Payment Processing
-
-**Priority:** 🟡 MEDIUM
-**Summary:** The system must handle payment processing within 2 seconds. The payment gateway must support multiple currencies.
-**Analysis:** Cluster 'Handle Payment Processing' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: MEDIUM. Clustering quality (silhouette): 0.15 (weak).
-
-### Requirements
-
-**REQ-002.1:** The system must handle payment processing within 2 seconds.
-
-*Type: 📊 Non-Functional*
-
-| Attribute | Value |
-|-----------|-------|
-| **Actor** | system |
-| **Action** | handle |
-| **Feature** | payment processing |
-| **Constraint** | within 2 seconds |
-
-> **Canonical:** system shall handle payment processing within 2 seconds.
-
-**Priority: MEDIUM** | Confidence: 62.4%
-  - Contains critical time constraints: 'within 2 seconds' (+2)
-  - High importance due to mandatory requirement ('must') (+1)
-
-**REQ-002.2:** The payment gateway must support multiple currencies.
-
-*Type: ⚙️ Functional*
-
-| Attribute | Value |
-|-----------|-------|
-| **Feature** | payment gateway |
-
-> **Canonical:** The system shall payment gateway.
-
-**Priority: LOW** | Confidence: 62.2%
-  - High importance due to mandatory requirement ('must') (+1)
 
 ---
 
 ## REQ-004: Load Dashboard
 
-**Priority:** 🟡 MEDIUM
+**Priority:** 🔴 HIGH
 **Summary:** The dashboard must load within 3 seconds. The search functionality should return results in under 1 second.
-**Analysis:** Cluster 'Load Dashboard' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: MEDIUM. Clustering quality (silhouette): 0.15 (weak).
+**Analysis:** Cluster 'Load Dashboard' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
 
 ### Requirements
 
@@ -170,10 +168,12 @@
 | **Action** | load |
 | **Feature** | dashboard |
 | **Constraint** | within 3 seconds |
+| **Priority Indicator** | must |
 
 > **Canonical:** The system shall load dashboard within 3 seconds.
 
-**Priority: MEDIUM** | Confidence: 58.7%
+**Priority: HIGH** | Confidence: 58.7%
+  - Elevated priority due to explicit indicator: 'must' (+5)
   - Contains critical time constraints: 'within 3 seconds' (+2)
   - High importance due to mandatory requirement ('must') (+1)
 
@@ -183,89 +183,26 @@
 
 | Attribute | Value |
 |-----------|-------|
+| **Actor** | The search |
 | **Action** | return |
-| **Feature** | search functionality |
+| **Feature** | results |
 | **Constraint** | in under 1 second |
+| **Priority Indicator** | should |
 
-> **Canonical:** The system shall return search functionality in under 1 second.
+> **Canonical:** The search shall return results in under 1 second.
 
-**Priority: MEDIUM** | Confidence: 62.2%
+**Priority: HIGH** | Confidence: 62.2%
+  - Elevated priority due to explicit indicator: 'should' (+5)
   - Contains critical time constraints: 'in under 1 second' (+2)
   - Medium importance due to expected requirement ('should') (+0.5)
 
 ---
 
-## REQ-006: Mobile App Offline Support
-
-**Priority:** 🟡 MEDIUM
-**Summary:** The mobile app needs to work offline without data loss.
-**Analysis:** Cluster 'Mobile App Offline Support' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: MEDIUM. Clustering quality (silhouette): 0.15 (weak).
-
-### Requirements
-
-**REQ-006.1:** The mobile app needs to work offline without data loss.
-
-*Type: ⚙️ Functional*
-
-| Attribute | Value |
-|-----------|-------|
-| **Action** | work |
-| **Feature** | mobile app |
-| **Constraint** | offline without data |
-
-> **Canonical:** The system shall work mobile app offline without data.
-
-**Priority: MEDIUM** | Confidence: 59.9%
-  - High risk impact word detected: 'data loss' (+4)
-
----
-
-## REQ-001: Email More Reliable
-
-**Priority:** 🟢 LOW
-**Summary:** Customers should receive email notifications when orders are shipped. The checkout flow needs to be more reliable during sales events.
-**Analysis:** Cluster 'Email More Reliable' contains 2 requirement(s) grouped by semantic similarity. Cluster priority: LOW. Clustering quality (silhouette): 0.15 (weak).
-
-### Requirements
-
-**REQ-001.1:** Customers should receive email notifications when orders are shipped.
-
-*Type: ⚙️ Functional*
-
-| Attribute | Value |
-|-----------|-------|
-| **Actor** | Customers |
-| **Action** | receive |
-| **Feature** | email |
-| **Constraint** | when orders are shipped |
-
-> **Canonical:** Customers shall receive email when orders are shipped.
-
-**Priority: LOW** | Confidence: 59.8%
-  - Medium importance due to expected requirement ('should') (+0.5)
-
-**REQ-001.2:** The checkout flow needs to be more reliable during sales events.
-
-*Type: 📊 Non-Functional*
-
-| Attribute | Value |
-|-----------|-------|
-| **Feature** | checkout flow |
-| **Quality** | more reliable |
-| **Constraint** | during sales events |
-
-> **Canonical:** The system shall checkout flow with more reliable requirements during sales events.
-
-**Priority: LOW** | Confidence: 58.5%
-  - Specifies essential quality attributes: 'more reliable, reliable' (+1)
-
----
-
 ## REQ-005: Export Reports
 
-**Priority:** 🟢 LOW
+**Priority:** 🔴 HIGH
 **Summary:** Users must be able to export reports as PDF.
-**Analysis:** Cluster 'Export Reports' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: LOW. Clustering quality (silhouette): 0.15 (weak).
+**Analysis:** Cluster 'Export Reports' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
 
 ### Requirements
 
@@ -278,19 +215,50 @@
 | **Actor** | Users |
 | **Action** | export |
 | **Feature** | reports |
+| **Constraint** | as PDF. |
+| **Priority Indicator** | must |
 
-> **Canonical:** Users shall export reports.
+> **Canonical:** Users shall export reports as PDF.
 
-**Priority: LOW** | Confidence: 61.0%
+**Priority: HIGH** | Confidence: 61.0%
+  - Elevated priority due to explicit indicator: 'must' (+5)
   - High importance due to mandatory requirement ('must') (+1)
 
 ---
 
-## REQ-007: Login Page
+## REQ-006: Offline Support
 
-**Priority:** 🟢 LOW
+**Priority:** 🔴 HIGH
+**Summary:** The mobile app needs to work offline without data loss.
+**Analysis:** Cluster 'Offline Support' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
+
+### Requirements
+
+**REQ-006.1:** The mobile app needs to work offline without data loss.
+
+*Type: ⚙️ Functional*
+
+| Attribute | Value |
+|-----------|-------|
+| **Actor** | The mobile app |
+| **Action** | work |
+| **Constraint** | offline |
+| **Constraint** | without data loss |
+| **Priority Indicator** | needs to |
+
+> **Canonical:** The mobile app shall work offline, without data loss.
+
+**Priority: HIGH** | Confidence: 59.9%
+  - Elevated priority due to explicit indicator: 'needs to' (+5)
+  - High risk impact word detected: 'data loss' (+4)
+
+---
+
+## REQ-007: Support Login Page
+
+**Priority:** 🔴 HIGH
 **Summary:** The login page must support single sign-on via OAuth.
-**Analysis:** Cluster 'Login Page' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: LOW. Clustering quality (silhouette): 0.15 (weak).
+**Analysis:** Cluster 'Support Login Page' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
 
 ### Requirements
 
@@ -300,12 +268,68 @@
 
 | Attribute | Value |
 |-----------|-------|
+| **Actor** | OAuth |
+| **Action** | support |
 | **Feature** | login page |
+| **Constraint** | on |
+| **Priority Indicator** | must |
 
-> **Canonical:** The system shall login page.
+> **Canonical:** OAuth shall support login page on.
 
-**Priority: LOW** | Confidence: 62.5%
+**Priority: HIGH** | Confidence: 62.5%
+  - Elevated priority due to explicit indicator: 'must' (+5)
   - High importance due to mandatory requirement ('must') (+1)
+
+---
+
+## REQ-008: Audit Logs
+
+**Priority:** 🔴 HIGH
+**Summary:** Admin users need urgent access to the audit logs.
+**Analysis:** Cluster 'Audit Logs' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
+
+### Requirements
+
+**REQ-008.1:** Admin users need urgent access to the audit logs.
+
+*Type: ⚙️ Functional*
+
+| Attribute | Value |
+|-----------|-------|
+| **Actor** | Admin |
+| **Feature** | audit logs |
+| **Priority Indicator** | need urgent access |
+
+> **Canonical:** Admin shall audit logs.
+
+**Priority: HIGH** | Confidence: 60.8%
+  - Elevated priority due to explicit indicator: 'need urgent access' (+5)
+  - High importance due to mandatory requirement ('need') (+1)
+
+---
+
+## REQ-009: User Passwords
+
+**Priority:** 🔴 HIGH
+**Summary:** It is critical that user passwords are encrypted at all times.
+**Analysis:** Cluster 'User Passwords' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH. Clustering quality (silhouette): 0.15 (weak).
+
+### Requirements
+
+**REQ-009.1:** It is critical that user passwords are encrypted at all times.
+
+*Type: 📊 Non-Functional*
+
+| Attribute | Value |
+|-----------|-------|
+| **Feature** | user passwords |
+| **Constraint** | at all times |
+| **Priority Indicator** | It |
+
+> **Canonical:** The system shall user passwords at all times.
+
+**Priority: HIGH** | Confidence: 61.5%
+  - Elevated priority due to explicit indicator: 'It, is critical that' (+5)
 
 ---
 
