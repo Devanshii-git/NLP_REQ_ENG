@@ -1,0 +1,199 @@
+{
+  "metadata": {
+    "title": "Software Requirements Specification",
+    "generated_at": "2026-03-30T20:02:09.161264",
+    "total_requirements": 4,
+    "total_clusters": 4
+  },
+  "requirement_groups": [
+    {
+      "group_id": "REQ-001",
+      "group_name": "Cluster 1",
+      "priority": "HIGH",
+      "summary": "The system must handle 10000 users concurrently.",
+      "silhouette_score": -1.0,
+      "explanation": "Cluster 'Cluster 1' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH.",
+      "requirements": [
+        {
+          "sentence": "The system must handle 10000 users concurrently.",
+          "confidence": 0.6188,
+          "priority": "HIGH",
+          "priority_score": 6,
+          "priority_reasons": [
+            "Elevated priority due to explicit indicator: 'must' (+5)",
+            "High importance due to mandatory requirement ('must') (+1)"
+          ],
+          "requirement_type": "functional",
+          "structured": {
+            "actor": "The system",
+            "action": "handle",
+            "feature": null,
+            "all_features": [],
+            "quality_attribute": null,
+            "constraints": [
+              "concurrently."
+            ],
+            "priority_indicator": "must",
+            "canonical_statement": "The system shall handle concurrently."
+          },
+          "entities": {
+            "actors": [
+              "The system"
+            ],
+            "actions": [
+              "handle"
+            ],
+            "features": [],
+            "quality_attributes": [],
+            "constraints": [
+              "concurrently."
+            ],
+            "priority_indicators": [
+              "must"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "REQ-002",
+      "group_name": "Fix Bug",
+      "priority": "HIGH",
+      "summary": "It is critical to fix the payment bug.",
+      "silhouette_score": -1.0,
+      "explanation": "Cluster 'Fix Bug' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH.",
+      "requirements": [
+        {
+          "sentence": "It is critical to fix the payment bug.",
+          "confidence": 0.5845,
+          "priority": "HIGH",
+          "priority_score": 5,
+          "priority_reasons": [
+            "Elevated priority due to explicit indicator: 'critical to' (+5)"
+          ],
+          "requirement_type": "functional",
+          "structured": {
+            "actor": "It is",
+            "action": "fix",
+            "feature": "bug",
+            "all_features": [
+              "bug"
+            ],
+            "quality_attribute": null,
+            "constraints": [],
+            "priority_indicator": "critical to",
+            "canonical_statement": "It is shall fix bug."
+          },
+          "entities": {
+            "actors": [
+              "It is",
+              "the payment"
+            ],
+            "actions": [
+              "fix"
+            ],
+            "features": [
+              "bug"
+            ],
+            "quality_attributes": [],
+            "constraints": [],
+            "priority_indicators": [
+              "critical to"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "REQ-003",
+      "group_name": "Login Delays",
+      "priority": "HIGH",
+      "summary": "Users are complaining about login delays.",
+      "silhouette_score": -1.0,
+      "explanation": "Cluster 'Login Delays' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH.",
+      "requirements": [
+        {
+          "sentence": "Users are complaining about login delays.",
+          "confidence": 0.5961,
+          "priority": "HIGH",
+          "priority_score": 9,
+          "priority_reasons": [
+            "Elevated priority due to explicit indicator: 'are complaining about' (+5)",
+            "User pain point identified showing negative sentiment: 'complaining' (+4)"
+          ],
+          "requirement_type": "functional",
+          "structured": {
+            "actor": "Users",
+            "action": null,
+            "feature": "login delays",
+            "all_features": [
+              "login delays"
+            ],
+            "quality_attribute": null,
+            "constraints": [],
+            "priority_indicator": "are complaining about",
+            "canonical_statement": "Users shall login delays."
+          },
+          "entities": {
+            "actors": [
+              "Users"
+            ],
+            "actions": [],
+            "features": [
+              "login delays"
+            ],
+            "quality_attributes": [],
+            "constraints": [],
+            "priority_indicators": [
+              "are complaining about"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "REQ-004",
+      "group_name": "Cluster 4",
+      "priority": "HIGH",
+      "summary": "Login timeout causes data loss.",
+      "silhouette_score": -1.0,
+      "explanation": "Cluster 'Cluster 4' contains 1 requirement(s) grouped by semantic similarity. Cluster priority: HIGH.",
+      "requirements": [
+        {
+          "sentence": "Login timeout causes data loss.",
+          "confidence": 0.6052,
+          "priority": "HIGH",
+          "priority_score": 13,
+          "priority_reasons": [
+            "Elevated priority due to explicit indicator: 'causes data' (+5)",
+            "User pain point identified showing negative sentiment: 'timeout' (+4)",
+            "High risk impact word detected: 'timeout' (+4)"
+          ],
+          "requirement_type": "functional",
+          "structured": {
+            "actor": null,
+            "action": "Login",
+            "feature": null,
+            "all_features": [],
+            "quality_attribute": null,
+            "constraints": [],
+            "priority_indicator": "causes data",
+            "canonical_statement": "The system shall Login."
+          },
+          "entities": {
+            "actors": [],
+            "actions": [
+              "Login"
+            ],
+            "features": [],
+            "quality_attributes": [],
+            "constraints": [],
+            "priority_indicators": [
+              "causes data"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

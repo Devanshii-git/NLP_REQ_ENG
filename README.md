@@ -108,8 +108,15 @@ python -m spacy train ner_model/config.cfg \
 
 ### 4. Run the full pipeline
 
+**For Raw Text:**
 ```bash
 python -m inference_pipeline.example_run
+```
+
+**For Structured Production JSON (Jira, Slack, Email):**
+We support ingesting structured JSON payloads natively. Try the built-in mock Jira JSON payload:
+```bash
+python -m inference_pipeline.example_run_json
 ```
 
 ### 5. Evaluate both models
@@ -157,17 +164,32 @@ python -m evaluation.run_all_evaluations
 
 ---
 
-## Dataset Recommendations
+## Dataset Recommendations & Training on Custom Data
 
 | Model              | Minimum   | Recommended | Notes                            |
 | ------------------ | --------- | ----------- | -------------------------------- |
 | Req. Classifier    | 300       | 500–1000    | Balanced classes                 |
-| NER Model          | 100       | 200–500     | ≥30 examples per entity type     |
+| NER Model          | 100       | 300–5000+   | ≥30 examples per entity type     |
 
-### Annotation Tools
+### 1. Annotation Tools
+If you want to transition from our synthetic dataset to your own team's manual real-world annotations, you can use:
 - **[Label Studio](https://labelstud.io/)** — Open-source, supports both text classification and NER span labelling.
 - **[Doccano](https://github.com/doccano/doccano)** — Lightweight, NER-friendly.
 - **[Prodigy](https://prodi.gy/)** — Commercial, integrates with spaCy.
+
+### 2. Converting Custom Data
+Once you annotate your custom data, export it via your annotation tool (e.g., as JSONL) and convert it into spaCy's native binary format:
+```bash
+python -m spacy convert your_custom_data.json ./data/ner
+```
+Rename the outputs to `train.spacy` and `dev.spacy` to overwrite the default dataset.
+
+### 3. Scaling Your Config Settings
+Real-world data is noisy. Open `ner_model/config.cfg` and change the following settings to optimize for production-scale learning:
+- **`max_steps`**: Increase to `2000` or `5000+` to allow for multi-epoch learning.
+- **`patience`**: Increase to `500` or `1000`.
+- **`eval_frequency`**: Reduce to ~`100`.
+- **`grad_factor`**: If your dataset is huge (5000+ sentences), change `grad_factor = 0.0` to `grad_factor = 1.0` inside `[components.ner.model.tok2vec]` to unfreeze the BERT layers and fine-tune the core transformer natively for your organization!
 
 ---
 

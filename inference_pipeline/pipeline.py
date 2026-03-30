@@ -26,6 +26,7 @@ from prioritization.prioritizer import RequirementPrioritizer
 from summarization.summarizer import RequirementSummarizer
 from explainability.explainer import ExplainabilityEngine
 from output_generator.generator import OutputGenerator
+from preprocessing.json_parser import JSONPreprocessor
 
 
 class RequirementsEngineeringPipeline:
@@ -69,6 +70,9 @@ class RequirementsEngineeringPipeline:
         print("[Phase 8] Initializing output generator …")
         self.output_generator = OutputGenerator()
 
+        print("[Phase 0] Initializing JSON Preprocessor (Production Ready) …")
+        self.json_preprocessor = JSONPreprocessor()
+
         self.confidence_threshold = confidence_threshold
         print("\n✓ Pipeline fully initialized and ready.\n")
 
@@ -106,6 +110,35 @@ class RequirementsEngineeringPipeline:
                 requirements.append(req)
 
         return requirements
+
+    def run_json(
+        self,
+        json_payload: str | dict | list,
+        output_json: str = "output/requirements.json",
+        output_md: str = "output/requirements.md",
+        print_to_console: bool = True,
+    ) -> list[dict[str, Any]]:
+        """
+        Production entry point: Parses unstructured/structured JSON payloads
+        from Jira/Slack/Email, flattens them into normalized text, and passes
+        them strictly to the NLP pipeline.
+        """
+        print("─" * 60)
+        print("  PROCESSING STRUCTURED JSON PAYLOAD (Jira/Slack/Email)")
+        print("─" * 60)
+        
+        flat_text = self.json_preprocessor.parse_to_text(json_payload)
+        
+        if not flat_text:
+            print("  [ERROR] Parsed JSON yielded no extractable text. Exiting pipeline.")
+            return []
+            
+        return self.run(
+            text=flat_text,
+            output_json=output_json,
+            output_md=output_md,
+            print_to_console=print_to_console
+        )
 
     def run(
         self,
