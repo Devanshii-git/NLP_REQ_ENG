@@ -23,6 +23,8 @@ from ner_model.inference_ner import NERExtractor
 from structuring.structurer import RequirementStructurer
 from clustering.cluster import RequirementClusterer
 from prioritization.prioritizer import RequirementPrioritizer
+from prioritization.semantic_corrector import SemanticPriorityCorrector
+from prioritization.final_arbiter import FinalPriorityArbiter
 from summarization.summarizer import RequirementSummarizer
 from explainability.explainer import ExplainabilityEngine
 from output_generator.generator import OutputGenerator
@@ -63,6 +65,12 @@ class RequirementsEngineeringPipeline:
 
         print(f"[Phase 7] Loading summarization model ({summarizer_model}) …")
         self.summarizer = RequirementSummarizer(model_key=summarizer_model)
+
+        print("[Phase 6b] Initializing semantic priority corrector …")
+        self.semantic_corrector = SemanticPriorityCorrector()
+
+        print("[Phase 6c] Initializing final priority arbiter …")
+        self.final_arbiter = FinalPriorityArbiter()
 
         print("[Phase 7b] Initializing explainability engine …")
         self.explainer = ExplainabilityEngine()
@@ -190,6 +198,39 @@ class RequirementsEngineeringPipeline:
             priority_counts[c.get("cluster_priority", "LOW")] += 1
         print(
             f"  Priorities: "
+            f"{priority_counts['HIGH']} HIGH, "
+            f"{priority_counts['MEDIUM']} MEDIUM, "
+            f"{priority_counts['LOW']} LOW"
+        )
+
+        # --- Phase 6b: Semantic Priority Correction -------------------------
+        print("\n▶ Phase 6b: Semantic priority correction …")
+        clusters = self.semantic_corrector.correct_clusters(clusters)
+        override_count = sum(c.get("semantic_overrides", 0) for c in clusters)
+        if override_count:
+            print(f"  ⚡ {override_count} priority override(s) applied by semantic analysis")
+        # Recount after correction
+        priority_counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
+        for c in clusters:
+            priority_counts[c.get("cluster_priority", "LOW")] += 1
+        print(
+            f"  Corrected priorities: "
+            f"{priority_counts['HIGH']} HIGH, "
+            f"{priority_counts['MEDIUM']} MEDIUM, "
+            f"{priority_counts['LOW']} LOW"
+        )
+
+        # --- Phase 6c: Final Priority Arbitration ----------------------------
+        print("\n▶ Phase 6c: Final priority arbitration …")
+        clusters = self.final_arbiter.arbitrate_clusters(clusters)
+        final_overrides = sum(c.get("final_overrides", 0) for c in clusters)
+        if final_overrides:
+            print(f"  ⚡ {final_overrides} final override(s) by arbitration layer")
+        priority_counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
+        for c in clusters:
+            priority_counts[c.get("cluster_priority", "LOW")] += 1
+        print(
+            f"  Final priorities: "
             f"{priority_counts['HIGH']} HIGH, "
             f"{priority_counts['MEDIUM']} MEDIUM, "
             f"{priority_counts['LOW']} LOW"

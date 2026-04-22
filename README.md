@@ -99,11 +99,11 @@ python -m spacy train ner_model/config.cfg \
     --paths.dev   data/ner/dev.spacy
 
 # Or with GPU:
-# python -m spacy train ner_model/config.cfg \
-#     --output ner_model/output \
-#     --paths.train data/ner/train.spacy \
-#     --paths.dev   data/ner/dev.spacy \
-#     --gpu-id 0
+python -m spacy train ner_model/config.cfg \
+    --output ner_model/output \
+    --paths.train data/ner/train.spacy \
+    --paths.dev   data/ner/dev.spacy \
+    --gpu-id 0
 ```
 
 ### 4. Run the full pipeline
