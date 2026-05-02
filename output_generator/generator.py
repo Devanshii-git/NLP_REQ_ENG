@@ -1,4 +1,4 @@
-"""
+﻿"""
 generator.py — Improved Structured Output Generator
 ======================================================
 Outputs structured requirement documents with:
@@ -95,7 +95,7 @@ class OutputGenerator:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(document, f, indent=2, ensure_ascii=False, cls=NpEncoder)
 
-        print(f"✓ JSON output saved to: {output_path}")
+        print(f"[OK] JSON output saved to: {output_path}")
         return output_path
 
     # -----------------------------------------------------------------------
@@ -219,7 +219,7 @@ class OutputGenerator:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(content)
 
-        print(f"✓ Markdown SRS saved to: {output_path}")
+        print(f"[OK] Markdown SRS saved to: {output_path}")
         return output_path
 
     # -----------------------------------------------------------------------
@@ -243,18 +243,18 @@ class OutputGenerator:
             summary = cluster.get("cluster_summary", "")
 
             print()
-            print(f"  ┌─── {gid}: {name}  [{pri}]")
+            print(f"  +--- {gid}: {name}  [{pri}]")
             if summary:
-                print(f"  │  Summary: {summary}")
+                print(f"  |  Summary: {summary}")
 
             explanation = cluster.get("cluster_explanation", "")
             if explanation:
-                print(f"  │  Analysis: {explanation}")
+                print(f"  |  Analysis: {explanation}")
 
             for i, req in enumerate(cluster["requirements"], 1):
                 structured = req.get("structured", {})
                 req_type = structured.get("requirement_type", "unknown")
-                prefix = "  │"
+                prefix = "  |"
 
                 print(f"{prefix}")
                 print(f"{prefix}  {gid}.{i}: {req['sentence']}")
@@ -279,9 +279,9 @@ class OutputGenerator:
                 # Show priority reasons
                 reasons = req.get("priority_reasons", [])
                 for reason in reasons:
-                    print(f"{prefix}      → {reason}")
+                    print(f"{prefix}      -> {reason}")
 
-            print("  └" + "─" * 66)
+            print("  +" + "-" * 66)
 
         print()
         print("=" * 70)

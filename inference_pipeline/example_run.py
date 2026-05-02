@@ -12,9 +12,6 @@ Usage:
 from inference_pipeline.pipeline import RequirementsEngineeringPipeline
 
 
-# ---------------------------------------------------------------------------
-# Realistic stakeholder communication (mix of requirements and noise)
-# ---------------------------------------------------------------------------
 SAMPLE_TEXT = """
 Users are complaining that login is too slow during peak hours.
 Good morning everyone.

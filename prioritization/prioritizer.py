@@ -36,6 +36,16 @@ HIGH_PRIORITY_KEYWORDS = {
     "essential", "mandatory", "crucial", "vital",
 }
 
+BUSINESS_VALUE_WORDS = {
+    "revenue", "roi", "compliance", "legal", "cost", 
+    "customer retention", "conversion", "billing", "payment"
+}
+
+COSMETIC_WORDS = {
+    "color", "font", "padding", "margin", "aesthetic",
+    "look and feel", "cosmetic", "typo", "minor", "tweak"
+}
+
 IMPACT_WORDS = {
     "data loss", "security breach", "downtime", "crash", "failure",
     "outage", "vulnerability", "exploit", "corruption", "unavailable",
@@ -90,23 +100,30 @@ class RequirementPrioritizer:
         sentence_lower = sentence.lower()
         words = set(sentence_lower.split())
 
-        # --- Signal 1: PRIORITY_INDICATOR entity (+5) -----------------------
+        # --- Signal 1: PRIORITY_INDICATOR entity (+3) -----------------------
         priority_indicators = grouped.get("PRIORITY_INDICATOR", [])
         if priority_indicators:
-            score += 5
+            score += 3
             reasons.append(
-                f"Elevated priority due to explicit indicator: '{', '.join(priority_indicators)}' (+5)"
+                f"Elevated priority due to explicit indicator: '{', '.join(priority_indicators)}' (+3)"
             )
 
-        # --- Signal 2: Urgency keywords in text (+5) ------------------------
+        # --- Signal 2: Urgency keywords in text (+3) ------------------------
         if not priority_indicators:
             for keyword in HIGH_PRIORITY_KEYWORDS:
                 if keyword in sentence_lower:
-                    score += 5
-                    reasons.append(f"Elevated priority due to urgency keyword: '{keyword}' (+5)")
+                    score += 3
+                    reasons.append(f"Elevated priority due to urgency keyword: '{keyword}' (+3)")
                     break
 
-        # --- Signal 3: Time constraint in CONSTRAINT (+2) -------------------
+        # --- Signal 3: Business Value keywords (+3) -------------------------
+        for keyword in BUSINESS_VALUE_WORDS:
+            if keyword in sentence_lower:
+                score += 3
+                reasons.append(f"High business value detected: '{keyword}' (+3)")
+                break
+
+        # --- Signal 4: Time constraint in CONSTRAINT (+2) -------------------
         constraints = grouped.get("CONSTRAINT", [])
         for constraint in constraints:
             if TIME_CONSTRAINT_PATTERN.search(constraint):
@@ -114,7 +131,7 @@ class RequirementPrioritizer:
                 reasons.append(f"Contains critical time constraints: '{constraint}' (+2)")
                 break
 
-        # --- Signal 4: Sentiment analysis (+4 for negative) -----------------
+        # --- Signal 5: Sentiment analysis (+4 for negative) -----------------
         neg_found = words & NEGATIVE_WORDS
         if neg_found:
             score += 4
@@ -122,14 +139,14 @@ class RequirementPrioritizer:
                 f"User pain point identified showing negative sentiment: '{', '.join(sorted(neg_found))}' (+4)"
             )
 
-        # --- Signal 5: Impact words (+4) ------------------------------------
+        # --- Signal 6: Impact words (+4) ------------------------------------
         for impact in IMPACT_WORDS:
             if impact in sentence_lower:
                 score += 4
                 reasons.append(f"High risk impact word detected: '{impact}' (+4)")
                 break
 
-        # --- Signal 6: QUALITY_ATTRIBUTE (+1) -------------------------------
+        # --- Signal 7: QUALITY_ATTRIBUTE (+1) -------------------------------
         quality_attrs = grouped.get("QUALITY_ATTRIBUTE", [])
         if quality_attrs:
             score += 1
@@ -137,7 +154,14 @@ class RequirementPrioritizer:
                 f"Specifies essential quality attributes: '{', '.join(quality_attrs)}' (+1)"
             )
 
-        # --- Signal 7: Modal verb strength (+1 strong, +0.5 medium) ---------
+        # --- Signal 8: Cosmetic/Negative signals (-2) -----------------------
+        for cosmetic in COSMETIC_WORDS:
+            if cosmetic in sentence_lower:
+                score -= 2
+                reasons.append(f"Cosmetic/minor classification: '{cosmetic}' (-2)")
+                break
+
+        # --- Signal 9: Modal verb strength (+1 strong, +0.5 medium) ---------
         if words & STRONG_MODALS:
             score += 1
             found = words & STRONG_MODALS
@@ -147,7 +171,7 @@ class RequirementPrioritizer:
             found = words & MEDIUM_MODALS
             reasons.append(f"Medium importance due to expected requirement ('{', '.join(found)}') (+0.5)")
 
-        # --- Signal 8: Frequency (if batch context provided) (+3) -----------
+        # --- Signal 10: Frequency (if batch context provided) (+3) -----------
         if all_sentences:
             # Count how many sentences mention similar key terms
             key_features = grouped.get("FEATURE", [])
@@ -184,12 +208,38 @@ class RequirementPrioritizer:
         self,
         requirements: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
-        """Prioritize a list of requirements with frequency context."""
+        """Prioritize a list of requirements with frequency context and distribution guard."""
         all_sentences = [r.get("sentence", "") for r in requirements]
-        return [
+        prioritized = [
             self.prioritize_requirement(r, all_sentences)
             for r in requirements
         ]
+        return self._apply_distribution_guard(prioritized)
+
+    def _apply_distribution_guard(self, requirements: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """
+        Post-pass distribution guard to ensure ~20-30% HIGH priority max.
+        If too many HIGHs exist, demote the weakest ones to MEDIUM.
+        """
+        if not requirements:
+            return requirements
+            
+        highs = [r for r in requirements if r["priority"] == "HIGH"]
+        high_ratio = len(highs) / len(requirements)
+        
+        # Target max 30% HIGH
+        if high_ratio > 0.30:
+            target_high_count = int(len(requirements) * 0.30)
+            # Sort HIGHs by score ascending (weakest first)
+            highs.sort(key=lambda x: x["priority_score"])
+            
+            # Demote the weakest ones until we hit the target
+            demote_count = len(highs) - target_high_count
+            for i in range(demote_count):
+                highs[i]["priority"] = "MEDIUM"
+                highs[i]["priority_reasons"].append("Demoted to MEDIUM by distribution guard (target ~30% HIGH)")
+                
+        return requirements
 
     def prioritize_clusters(
         self,
@@ -208,9 +258,12 @@ class RequirementPrioritizer:
 
         for cluster in clusters:
             reqs = cluster["requirements"]
-            cluster["requirements"] = [
+            # Prioritize individual requirements and apply guard
+            reqs = [
                 self.prioritize_requirement(r, all_sentences) for r in reqs
             ]
+            reqs = self._apply_distribution_guard(reqs)
+            cluster["requirements"] = reqs
 
             if reqs:
                 best = min(

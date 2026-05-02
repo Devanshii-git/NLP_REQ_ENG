@@ -1,4 +1,4 @@
-"""
+﻿"""
 pipeline.py — Improved End-to-End Requirements Engineering Pipeline
 =====================================================================
 All 8 phases with improvements:
@@ -25,6 +25,7 @@ from clustering.cluster import RequirementClusterer
 from prioritization.prioritizer import RequirementPrioritizer
 from prioritization.semantic_corrector import SemanticPriorityCorrector
 from prioritization.final_arbiter import FinalPriorityArbiter
+from prioritization.llm_auditor import LLMAuditor
 from summarization.summarizer import RequirementSummarizer
 from explainability.explainer import ExplainabilityEngine
 from output_generator.generator import OutputGenerator
@@ -33,7 +34,7 @@ from preprocessing.json_parser import JSONPreprocessor
 
 class RequirementsEngineeringPipeline:
     """
-    Full pipeline: Raw Text → Structured, Prioritized, Explained Requirements.
+    Full pipeline: Raw Text -> Structured, Prioritized, Explained Requirements.
     """
 
     def __init__(
@@ -43,46 +44,61 @@ class RequirementsEngineeringPipeline:
         confidence_threshold: float = 0.5,
         summarizer_model: str = "t5-small",
         cluster_distance: float = 0.65,
+        enable_llm_audit: bool = False,
+        llm_api_key: str | None = None,
+        llm_model: str = "gpt-4o-mini",
     ):
         print("=" * 60)
         print("  Initializing Requirements Engineering Pipeline")
         print("=" * 60)
 
-        print("\n[Phase 3] Loading Requirement Detection model …")
+        print("\n[Phase 3] Loading Requirement Detection model ...")
         self.classifier = RequirementClassifier(classifier_dir)
 
-        print("[Phase 4] Loading NER Extraction model …")
+        print("[Phase 4] Loading NER Extraction model ...")
         self.ner = NERExtractor(ner_model_dir)
 
-        print("[Phase 4b] Initializing Requirement Structurer …")
+        print("[Phase 4b] Initializing Requirement Structurer ...")
         self.structurer = RequirementStructurer()
 
-        print("[Phase 5] Loading Sentence-BERT for clustering …")
-        self.clusterer = RequirementClusterer(distance_threshold=cluster_distance)
+        print("[Phase 5] Loading Sentence-BERT for clustering ...")
+        self.clusterer = RequirementClusterer()
 
-        print("[Phase 6] Initializing multi-signal prioritizer …")
+        print("[Phase 6] Initializing multi-signal prioritizer ...")
         self.prioritizer = RequirementPrioritizer()
 
-        print(f"[Phase 7] Loading summarization model ({summarizer_model}) …")
+        print(f"[Phase 7] Loading summarization model ({summarizer_model}) ...")
         self.summarizer = RequirementSummarizer(model_key=summarizer_model)
 
-        print("[Phase 6b] Initializing semantic priority corrector …")
+        print("[Phase 6b] Initializing semantic priority corrector ...")
         self.semantic_corrector = SemanticPriorityCorrector()
 
-        print("[Phase 6c] Initializing final priority arbiter …")
+        print("[Phase 6c] Initializing final priority arbiter ...")
         self.final_arbiter = FinalPriorityArbiter()
 
-        print("[Phase 7b] Initializing explainability engine …")
+        self._enable_llm_audit = enable_llm_audit
+        self._llm_auditor = None
+        if enable_llm_audit:
+            print("[Phase 6d] Initializing LLM auditor (OpenAI) ...")
+            try:
+                self._llm_auditor = LLMAuditor(
+                    api_key=llm_api_key, model=llm_model
+                )
+            except (ImportError, ValueError) as exc:
+                print(f"  ⚠ LLM auditor disabled: {exc}")
+                self._enable_llm_audit = False
+
+        print("[Phase 7b] Initializing explainability engine ...")
         self.explainer = ExplainabilityEngine()
 
-        print("[Phase 8] Initializing output generator …")
+        print("[Phase 8] Initializing output generator ...")
         self.output_generator = OutputGenerator()
 
-        print("[Phase 0] Initializing JSON Preprocessor (Production Ready) …")
+        print("[Phase 0] Initializing JSON Preprocessor (Production Ready) ...")
         self.json_preprocessor = JSONPreprocessor()
 
         self.confidence_threshold = confidence_threshold
-        print("\n✓ Pipeline fully initialized and ready.\n")
+        print("\n[OK] Pipeline fully initialized and ready.\n")
 
     @staticmethod
     def segment_sentences(text: str) -> list[str]:
@@ -91,7 +107,7 @@ class RequirementsEngineeringPipeline:
         return [s.strip() for s in raw_sentences if s.strip()]
 
     def _detect_and_extract(self, text: str) -> list[dict[str, Any]]:
-        """Phases 2–4b: segment → classify → NER → structure."""
+        """Phases 2-4b: segment -> classify -> NER -> structure."""
         sentences = self.segment_sentences(text)
         requirements = []
 
@@ -131,9 +147,9 @@ class RequirementsEngineeringPipeline:
         from Jira/Slack/Email, flattens them into normalized text, and passes
         them strictly to the NLP pipeline.
         """
-        print("─" * 60)
+        print("-" * 60)
         print("  PROCESSING STRUCTURED JSON PAYLOAD (Jira/Slack/Email)")
-        print("─" * 60)
+        print("-" * 60)
         
         flat_text = self.json_preprocessor.parse_to_text(json_payload)
         
@@ -154,15 +170,16 @@ class RequirementsEngineeringPipeline:
         output_json: str = "output/requirements.json",
         output_md: str = "output/requirements.md",
         print_to_console: bool = True,
+        enable_llm_audit: bool | None = None,
     ) -> list[dict[str, Any]]:
         """Execute the complete improved pipeline."""
 
-        print("─" * 60)
+        print("-" * 60)
         print("  RUNNING FULL PIPELINE (IMPROVED)")
-        print("─" * 60)
+        print("-" * 60)
 
-        # --- Phases 2–4b: Detect, Extract, Structure ------------------------
-        print("\n▶ Phases 2–4b: Segmentation → Classification → NER → Structuring …")
+        # --- Phases 2-4b: Detect, Extract, Structure ------------------------
+        print("\n> Phases 2-4b: Segmentation -> Classification -> NER -> Structuring ...")
         requirements = self._detect_and_extract(text)
         total_sentences = len(self.segment_sentences(text))
         print(
@@ -183,7 +200,7 @@ class RequirementsEngineeringPipeline:
         print(f"  Types: {func_count} functional, {nfr_count} non-functional")
 
         # --- Phase 5: Clustering -------------------------------------------
-        print("\n▶ Phase 5: Clustering similar requirements (Agglomerative) …")
+        print("\n> Phase 5: Clustering similar requirements (Agglomerative) ...")
         clusters = self.clusterer.cluster(requirements)
         sil = clusters[0].get("silhouette_score", -1) if clusters else -1
         print(f"  Formed {len(clusters)} cluster(s).")
@@ -191,7 +208,7 @@ class RequirementsEngineeringPipeline:
             print(f"  Silhouette score: {sil:.4f}")
 
         # --- Phase 6: Prioritization ----------------------------------------
-        print("\n▶ Phase 6: Multi-signal prioritization …")
+        print("\n> Phase 6: Multi-signal prioritization ...")
         clusters = self.prioritizer.prioritize_clusters(clusters)
         priority_counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
         for c in clusters:
@@ -204,11 +221,11 @@ class RequirementsEngineeringPipeline:
         )
 
         # --- Phase 6b: Semantic Priority Correction -------------------------
-        print("\n▶ Phase 6b: Semantic priority correction …")
+        print("\n> Phase 6b: Semantic priority correction ...")
         clusters = self.semantic_corrector.correct_clusters(clusters)
         override_count = sum(c.get("semantic_overrides", 0) for c in clusters)
         if override_count:
-            print(f"  ⚡ {override_count} priority override(s) applied by semantic analysis")
+            print(f"  * {override_count} priority override(s) applied by semantic analysis")
         # Recount after correction
         priority_counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
         for c in clusters:
@@ -221,11 +238,11 @@ class RequirementsEngineeringPipeline:
         )
 
         # --- Phase 6c: Final Priority Arbitration ----------------------------
-        print("\n▶ Phase 6c: Final priority arbitration …")
+        print("\n> Phase 6c: Final priority arbitration ...")
         clusters = self.final_arbiter.arbitrate_clusters(clusters)
         final_overrides = sum(c.get("final_overrides", 0) for c in clusters)
         if final_overrides:
-            print(f"  ⚡ {final_overrides} final override(s) by arbitration layer")
+            print(f"  * {final_overrides} final override(s) by arbitration layer")
         priority_counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
         for c in clusters:
             priority_counts[c.get("cluster_priority", "LOW")] += 1
@@ -236,23 +253,43 @@ class RequirementsEngineeringPipeline:
             f"{priority_counts['LOW']} LOW"
         )
 
+        # --- Phase 6d: LLM Audit (conditional) ------------------------------
+        should_audit = (
+            enable_llm_audit
+            if enable_llm_audit is not None
+            else self._enable_llm_audit
+        )
+        if should_audit and self._llm_auditor:
+            print("\n> Phase 6d: LLM priority validation (selective) ...")
+            clusters = self._llm_auditor.audit_clusters(clusters)
+            stats = self._llm_auditor.stats
+            print(
+                f"  Audited: {stats['total_audited']}, "
+                f"Skipped: {stats['total_skipped']}, "
+                f"Agreements: {stats['agreements']}, "
+                f"Disagreements: {stats['disagreements']}"
+            )
+            if stats['disagreements'] > 0:
+                print("  [LOG] Disagreements logged to output/llm_audit_log.jsonl")
+            self._llm_auditor.reset_stats()
+
         # --- Phase 7: Summarization ----------------------------------------
-        print("\n▶ Phase 7: Generating cluster summaries (dynamic length) …")
+        print("\n> Phase 7: Generating cluster summaries (dynamic length) ...")
         clusters = self.summarizer.summarize_clusters(clusters)
         print("  Summaries generated.")
 
         # --- Phase 7b: Explainability --------------------------------------
-        print("\n▶ Phase 7b: Generating explanations …")
+        print("\n> Phase 7b: Generating explanations ...")
         clusters = self.explainer.explain_clusters(clusters)
         print("  Explanations generated.")
 
         # --- Phase 8: Structured Output ------------------------------------
-        print("\n▶ Phase 8: Generating structured output …")
+        print("\n> Phase 8: Generating structured output ...")
         self.output_generator.to_json(clusters, output_json)
         self.output_generator.to_markdown(clusters, output_md)
 
         if print_to_console:
             self.output_generator.to_console(clusters)
 
-        print("\n✓ Pipeline complete.")
+        print("\n[OK] Pipeline complete.")
         return clusters

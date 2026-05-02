@@ -21,37 +21,23 @@ Usage:
     clusters = clusterer.cluster(requirements_list)
 """
 
+import numpy as np
+import umap
+import hdbscan
 from collections import defaultdict, Counter
 from typing import Any
-
-import numpy as np
-from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
-from sklearn.metrics.pairwise import cosine_distances
-
 from clustering.embeddings import SentenceEmbedder
-
 
 class RequirementClusterer:
     """
-    Cluster requirement sentences by semantic similarity.
-
-    Parameters
-    ----------
-    distance_threshold : float
-        Maximum cosine distance for merging clusters.
-        Lower = stricter (more clusters).  Default 0.65 groups
-        sentences that are reasonably related.
-    embedder : SentenceEmbedder, optional
-        Pre-loaded embedder.
+    Cluster requirement sentences by semantic similarity using UMAP + HDBSCAN.
     """
 
     def __init__(
         self,
-        distance_threshold: float = 0.40,
         embedder: SentenceEmbedder | None = None,
     ):
-        self.distance_threshold = distance_threshold
         self.embedder = embedder or SentenceEmbedder()
 
     def cluster(
@@ -60,17 +46,6 @@ class RequirementClusterer:
     ) -> list[dict[str, Any]]:
         """
         Cluster a list of requirement dicts.
-
-        Parameters
-        ----------
-        requirements : list[dict]
-            Each dict must have a ``"sentence"`` key.
-
-        Returns
-        -------
-        list[dict]
-            One dict per cluster with keys:
-                cluster_id, cluster_name, requirements, silhouette
         """
         if not requirements:
             return []
@@ -87,28 +62,57 @@ class RequirementClusterer:
                 "requirements": requirements,
             }]
 
-        # --- Step 2: Compute distance matrix --------------------------------
-        distance_matrix = cosine_distances(embeddings)
-
-        # --- Step 3: Agglomerative Clustering -------------------------------
-        clustering = AgglomerativeClustering(
-            n_clusters=None,
-            distance_threshold=self.distance_threshold,
-            metric="precomputed",
-            linkage="complete",
+        # --- Step 2: UMAP Dimensionality Reduction --------------------------
+        # Ensure n_neighbors doesn't exceed dataset size
+        n_neighbors = min(12, len(sentences) - 1)
+        if n_neighbors < 2:
+            n_neighbors = 2
+            
+        n_components = min(5, max(2, len(sentences) - 2))
+        reducer = umap.UMAP(
+            n_neighbors=n_neighbors,
+            min_dist=0.05,
+            n_components=n_components,
+            metric='cosine',
+            random_state=42
         )
-        labels = clustering.fit_predict(distance_matrix)
-        n_clusters = len(set(labels))
+        reduced_embeddings = reducer.fit_transform(embeddings)
+
+        # --- Step 3: HDBSCAN Clustering -------------------------------------
+        # Ensure min_cluster_size is appropriate for small datasets
+        min_cluster_size = min(4, len(sentences))
+        if min_cluster_size < 2:
+            min_cluster_size = 2
+            
+        clusterer = hdbscan.HDBSCAN(
+            min_cluster_size=min_cluster_size,
+            metric='euclidean',
+            cluster_selection_method='eom'
+        )
+        labels = clusterer.fit_predict(reduced_embeddings)
+        n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
 
         # --- Step 4: Compute silhouette score (cluster quality) -------------
         sil_score = -1.0
-        if n_clusters > 1 and n_clusters < len(sentences):
-            sil_score = silhouette_score(distance_matrix, labels, metric="precomputed")
+        # For silhouette, ignore noise points (-1)
+        mask = labels != -1
+        if np.sum(mask) > min_cluster_size and n_clusters > 1:
+            try:
+                sil_score = silhouette_score(reduced_embeddings[mask], labels[mask])
+            except Exception:
+                pass
 
         # --- Step 5: Group requirements by cluster --------------------------
         cluster_map: dict[int, list[dict[str, Any]]] = defaultdict(list)
+        noise_counter = max(labels) + 1 if len(labels) > 0 else 1
+        
         for idx, label in enumerate(labels):
-            cluster_map[label].append(requirements[idx])
+            if label == -1:
+                # Map noise to singleton clusters
+                cluster_map[noise_counter].append(requirements[idx])
+                noise_counter += 1
+            else:
+                cluster_map[label].append(requirements[idx])
 
         # --- Step 6: Build output -------------------------------------------
         clusters = []
@@ -118,7 +122,7 @@ class RequirementClusterer:
                 "cluster_id": cluster_id,
                 "cluster_name": cluster_name,
                 "requirements": reqs,
-                "silhouette_score": round(sil_score, 4),
+                "silhouette_score": round(sil_score, 4) if len(reqs) > 1 else 0.0,
             })
 
         return clusters
@@ -144,7 +148,6 @@ class RequirementClusterer:
             for quality in grouped.get("QUALITY_ATTRIBUTE", []):
                 quality_counts[quality.lower()] += 1
             for constraint in grouped.get("CONSTRAINT", []):
-                # Catch specific important constraint contexts for naming
                 if "offline" in constraint.lower():
                     quality_counts["offline support"] += 1
 
