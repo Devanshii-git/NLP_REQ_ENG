@@ -70,13 +70,13 @@ class RequirementStructurer:
         grouped = requirement.get("grouped", {})
         sentence = requirement.get("sentence", "")
 
-        # Extract primary entities (first of each type)
-        actors = grouped.get("ACTOR", [])
-        actions = grouped.get("ACTION", [])
-        features = grouped.get("FEATURE", [])
-        quality_attrs = grouped.get("QUALITY_ATTRIBUTE", [])
-        constraints = grouped.get("CONSTRAINT", [])
-        priorities = grouped.get("PRIORITY_INDICATOR", [])
+        # Clean up spans (edge-only trims)
+        actors = self._cleanup_spans(grouped.get("ACTOR", []))
+        actions = self._cleanup_spans(grouped.get("ACTION", []))
+        features = self._cleanup_spans(grouped.get("FEATURE", []))
+        quality_attrs = self._cleanup_spans(grouped.get("QUALITY_ATTRIBUTE", []))
+        constraints = self._cleanup_spans(grouped.get("CONSTRAINT", []))
+        priorities = self._cleanup_spans(grouped.get("PRIORITY_INDICATOR", []))
 
         # Determine requirement type
         req_type = self._classify_type(
@@ -100,6 +100,31 @@ class RequirementStructurer:
 
         requirement["structured"] = structured
         return requirement
+
+    @staticmethod
+    def _cleanup_spans(spans: list[str]) -> list[str]:
+        """
+        Deterministic span cleanup: Edge-only trims and domain whitelist protection.
+        """
+        import re
+        DOMAIN_WHITELIST = {"in-app", "real-time", "add-on", "log-in", "sign-in"}
+        cleaned = []
+        for span in spans:
+            original = span.strip()
+            # If it's a known domain term, preserve exactly
+            if original.lower() in DOMAIN_WHITELIST:
+                cleaned.append(original)
+                continue
+                
+            # Trim trailing prepositions/punctuation
+            span = re.sub(r"[\s,;:!?.]+$", "", original)
+            span = re.sub(r"\s+(within|under|before|after|in|on|at|for|to|with|by|from|into|as)$", "", span, flags=re.IGNORECASE)
+            
+            # Trim leading articles
+            span = re.sub(r"^(the|a|an)\s+", "", span, flags=re.IGNORECASE)
+            
+            cleaned.append(span.strip())
+        return cleaned
 
     def structure_all(
         self,

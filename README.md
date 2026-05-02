@@ -80,10 +80,10 @@ python -m spacy download en_core_web_sm
 
 ```bash
 python -m requirement_classifier.train \
-    --train_csv data/requirement_classification/train.csv \
-    --test_csv  data/requirement_classification/test.csv \
-    --output_dir requirement_classifier/saved_model \
-    --epochs 5 --batch_size 16 --lr 2e-5
+    train_csv data/requirement_classification/train.csv \
+    test_csv  data/requirement_classification/test.csv \
+    output_dir requirement_classifier/saved_model \
+    epochs 5 --batch_size 16 --lr 2e-5
 ```
 
 ### 3. Prepare NER data and train
